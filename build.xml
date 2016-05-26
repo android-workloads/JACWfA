@@ -1,0 +1,312 @@
+<project name="mttest" basedir="." default="main">
+
+    <property file="mttest.properties" />
+
+    <property name="design.lib.dir" value="extras/android/support/design" />
+    <property name="appcompat.lib.dir" value="extras/android/support/v7/appcompat" />
+    <property name="key.store" value="mttest.keystore" />
+    <property name="key.alias" value="androidMTTest" />
+
+    <property name="main.file.name" value="${mttest_workload_name}-${mttest_version}" />
+
+    <property name="build.dir" value="build" />
+    <property name="classes.dir" value="${build.dir}/classes" />
+    <property name="jar.dir" value="${build.dir}/jar" />
+    <property name="dex.dir" value="${build.dir}/dex" />
+    <property name="apk.dir" value="${build.dir}/apk" />
+    <property name="native.binaries.dir" value="${build.dir}/native" />
+
+    <property name="src.dir" value="src/main/java" />
+    <property name="android.native.libs.dir" value="${native.binaries.dir}/android" />
+    <property name="jni.dir" value="src/main/jni" />
+    <property name="res.dir" value="src/main/res" />
+    <property name="gen.dir" value="src/main/gen" />
+
+    <!--  <property name="bin.dir" value="bin" /> -->
+    <property name="dep.dir" value="dependencies" />
+    <property name="doc.dir" value="doc" />
+
+    <property name="main-class" value="com.intel.mttest.cmd.MTTestRunner" />
+    <!-- archives names -->
+    <property name="jar.bin.file" value="${main.file.name}.jar" />
+    <property name="jar.src.file" value="${main.file.name}-source.jar" />
+    <property name="jar.doc.file" value="${main.file.name}-doc.jar" />
+    <property name="apk.unsigned.file" value="${main.file.name}.unsigned.apk" />
+    <property name="apk.unaligned.file" value="${main.file.name}.unaligned.apk" />
+    <property name="apk.file" value="${main.file.name}.apk" />
+
+<!-- Tasks and resources section -->
+    <!-- vecmath is licensed under GPLv2 with CLASSPATH exception (https://java.net/projects/vecmath/sources/svn/content/trunk/COPYRIGHT.txt) -->
+    <property name="external.dep.vecmath" value="vecmath-1.5.2.jar" />
+    <property name="vecmath.maven.link" value="http://central.maven.org/maven2/javax/vecmath/vecmath/1.5.2/vecmath-1.5.2.jar" />
+
+    <target name="check-vecmath">
+        <available file="${dep.dir}/${external.dep.vecmath}" property="vecmath.present"/>
+    </target>
+
+    <target name="download-deps" depends="check-vecmath" unless="vecmath.present">
+        <get src="${vecmath.maven.link}" dest="${dep.dir}" />
+    </target>
+
+    <target name="declare-resources">
+        <path id="sources">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java" />
+            </fileset>
+            <fileset dir="${gen.dir}">
+                <include name="**/*.java" />
+            </fileset>
+        </path>
+
+        <path id="libraries">
+            <fileset dir="${dep.dir}" includes="**/*.jar" />
+            <fileset dir="${sdk_dir}">
+                <include name="platforms/${sdk_version}/android.jar" />
+                <include name="extras/android/support/v4/android-support-v4.jar" />
+                <include name="extras/android/support/multidex/library/libs/android-support-multidex.jar" />
+            </fileset>
+        </path>
+
+        <path id="test.classpath">
+            <path refid="test.libraries" />
+            <pathelement location="${classes.dir}" />
+        </path>
+
+    </target>
+
+    <target name="define-custom-tasks" depends="declare-resources">
+        <macrodef name="clean-shared-libs">
+            <attribute name="dir" default="unknown"/>
+            <sequential>
+                <exec dir="@{dir}" executable="bash" failonerror="true">
+                    <arg value="build_native.sh" />
+                    <arg value="java" />
+                    <arg value="${native.binaries.dir}/linux" />
+                    <arg value="clean" />
+                </exec>
+                <exec dir="@{dir}" executable="bash">
+                    <arg value="build_native.sh" />
+                    <arg value="android" />
+                    <arg value="${native.binaries.dir}/android" />
+                    <arg value="clean" />
+                </exec>
+            </sequential>
+        </macrodef>
+
+        <macrodef name="build-shared-lib-from-source">
+            <attribute name="dir" default="unknown"/>
+            <attribute name="mode" default="unknown"/>
+            <attribute name="destdir" default="unknown"/>
+            <sequential>
+                <exec dir="@{dir}" executable="bash" failonerror="true">
+                    <arg value="build_native.sh" />
+                    <arg value="@{mode}" />
+                    <arg value="@{destdir}" />
+                </exec>
+            </sequential>
+        </macrodef>
+    </target>
+
+    <available file="aapt" filepath="${aapt_dir}" property="aapt.is.present" />
+<!-- Clean section -->
+
+    <target name="clean" depends="define-custom-tasks">
+        <delete dir="${build.dir}" />
+        <delete dir="${test.reports.dir}" />
+        <delete dir="./results" />
+        <delete dir="./src/main/bin" />
+        <clean-shared-libs dir="scripts" />
+    </target>
+
+<!-- Compile section -->
+    <target name="compile" depends="download-deps, declare-resources, define-custom-tasks, createR">
+        <mkdir dir="${classes.dir}"/>
+        <javac fork="true" executable="${java_home}/bin/javac"   includeantruntime="false" destdir="${classes.dir}" classpathref="libraries" debug="true" debuglevel="vars,lines,source">
+            <src path="${src.dir}" />
+            <src path="${gen.dir}" />
+        </javac>
+    </target>
+
+    <target name="doc" depends="compile">
+        <javadoc sourcepath="${src.dir}" destdir="${doc.dir}" classpathref="libraries" />
+    </target>
+
+    <target name="jardoc" depends="doc">
+        <jar basedir="${doc.dir}"  destfile="${doc.dir}/${jar.doc.file}" />
+    </target>
+
+    <target name="jarsrc" depends="createR">
+        <jar destfile="${jar.src.file}">
+        <fileset dir="${src.dir}">
+            <include name="**/*.java" />
+        </fileset>
+        <fileset dir="${gen.dir}">
+            <include name="**/*.java" />
+        </fileset>
+        </jar>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}" />
+        <jar basedir="${classes.dir}"  destfile="${jar.dir}/${jar.bin.file}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="compile-shared">
+        <build-shared-lib-from-source dir="scripts" mode="java" destdir="${native.binaries.dir}/linux" />
+    </target>
+
+    <target name="compile-android-shared">
+        <build-shared-lib-from-source dir="scripts" mode="android" destdir="${native.binaries.dir}/android" />
+    </target>
+
+<!-- Android section -->
+
+    <target name="createR" if="aapt.is.present">
+        <mkdir dir="${gen.dir}" />
+        <exec executable="${aapt_dir}/aapt" failonerror="true">
+            <arg value="package" />
+            <arg value="-v" />
+            <arg value="-f" />
+            <arg value="-m" />
+            <arg value="-M" />
+            <arg value="src/main/AndroidManifest.xml" />
+            <arg value="-S" />
+            <arg value="${res.dir}" />
+            <arg value="-J" />
+            <arg value="${gen.dir}" />
+            <arg value="-I" />
+            <arg value="${sdk_dir}/platforms/${sdk_version}/android.jar" />
+        </exec>
+    </target>
+
+    <target name="dex" depends="jar">
+        <mkdir dir="${dex.dir}" />
+        <exec executable="bash" failonerror="true">
+            <arg value="scripts/call_dex.sh" />
+            <arg value="${dex.dir}" />
+            <arg value="${jar.dir}" />
+            <arg value="${dep.dir}" />
+        </exec>
+    </target>
+
+    <target name="check-if-natives-exsit">
+        <condition property="natives.exist">
+            <available file="${android.native.libs.dir}" type="dir" />
+        </condition>
+    </target>
+
+    <target name="start-postprocess-apk" depends="make-first-apk">
+        <unzip src="${apk.dir}/${apk.unsigned.file}" dest="${apk.dir}/apk_extracted" />
+        <copy todir="${apk.dir}/apk_extracted/assets/configs">
+            <fileset dir="cfg/configs"/>
+        </copy>
+        <copy todir="${apk.dir}/apk_extracted/assets/testsets">
+            <fileset dir="cfg/testsets"/>
+        </copy>
+        <copy todir="${apk.dir}/apk_extracted/assets/goldens">
+            <fileset dir="cfg/goldens"/>
+        </copy>
+    </target>
+
+    <target name="copy-natives-apk" depends="check-if-natives-exsit, start-postprocess-apk" if="natives.exist">
+        <copy todir="${apk.dir}/apk_extracted/lib">
+            <fileset dir="${android.native.libs.dir}"/>
+        </copy>
+    </target>
+
+
+    <target name="apk" depends="start-postprocess-apk, copy-natives-apk">
+        <zip destfile="${apk.dir}/${apk.unsigned.file}" basedir="${apk.dir}/apk_extracted" />
+        <delete dir="${apk.dir}/apk_extracted" />
+    </target>
+
+    <target name="make-first-apk" depends="dex, compile-android-shared">
+        <mkdir dir="${apk.dir}" />
+        <exec executable="${aapt_dir}/aapt" failonerror="true">
+            <arg value="package" />
+            <arg value="-v" />
+            <arg value="-f" />
+            <arg value="-M" />
+            <arg value="./src/main/AndroidManifest.xml" />
+            <arg value="-I" />
+            <arg value="${sdk_dir}/platforms/${sdk_version}/android.jar" />
+            <arg value="-S" />
+            <arg value="${res.dir}" />
+            <arg value="-F" />
+            <arg value="./${apk.dir}/${apk.unsigned.file}" />
+            <arg value="${dex.dir}" />
+        </exec>
+        <delete dir="${dex.dir}" />
+    </target>
+
+    <target name="sign-apk" depends="apk">
+        <exec executable="${java_home}/bin/jarsigner" failonerror="true">
+            <arg value="-verbose" />
+            <arg value="-keystore" />
+            <arg value="debug.keystore" />
+            <arg value="-storepass" />
+            <arg value="123456" />
+            <arg value="-keypass" />
+            <arg value="654321" />
+            <arg value="-sigalg" />
+            <arg value="MD5withRSA" />
+            <arg value="-digestalg" />
+            <arg value="SHA1" />
+            <arg value="-signedjar" />
+            <arg value="./${apk.dir}/${apk.unaligned.file}" />
+            <arg value="./${apk.dir}/${apk.unsigned.file}" />
+            <arg value="androidMTTest" />
+        </exec>
+    </target>
+
+    <target name="align-apk" depends="sign-apk">
+        <exec executable="${zipalign_dir}/zipalign" failonerror="true">
+            <arg value="-f" />
+            <arg value="-v" />
+            <arg value="4" />
+            <arg value="./${apk.dir}/${apk.unaligned.file}" />
+            <arg value="./${apk.dir}/${apk.file}" />
+        </exec>
+        <delete file="${apk.dir}/${apk.unsigned.file}" />
+        <delete file="${apk.dir}/${apk.unaligned.file}" />
+    </target>
+
+    <target name="install">
+        <exec executable="${android_platrorm_tools}/adb" failonerror="true">
+            <arg value="install" />
+            <arg value="${build.mode.dir}/${apk.file}" />
+        </exec>
+    </target>
+
+    <target name="upload-res">
+        <exec executable="${android_platrorm_tools}/adb" failonerror="true">
+            <arg value="shell" />
+            <arg value="mkdir -p storage/sdcard0/mttest/goldens;mkdir -p storage/sdcard0/mttest/mttestconf" />
+        </exec>
+        <exec executable="${android_platrorm_tools}/adb" failonerror="true">
+            <arg value="push" />
+            <arg value="./mttestgoldens" />
+            <arg value="storage/sdcard0/mttest/mttestgoldens" />
+        </exec>
+        <exec executable="${android_platrorm_tools}/adb" failonerror="true">
+            <arg value="push" />
+            <arg value="./mttestconf" />
+            <arg value="storage/sdcard0/mttest/mttestconf" />
+        </exec>
+    </target>
+
+<!-- General section -->
+
+    <target name="buildJava" depends="jar, compile-shared"/>
+    <target name="buildHost" depends="align-apk, compile-shared"/>
+    <target name="buildDevice" depends="align-apk"/>
+
+    <target name="main">
+        <echo level="info" message="This build file is not for direct use, please launch mttest.sh instead." />
+    </target>
+
+</project>

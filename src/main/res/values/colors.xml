@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    
+    <color name="default_background"> #00FFFF </color>
+    <color name="active_background"> #778800 </color>
+    <color name="default_text"> #444444 </color>
+    <color name="active_text"> #FF9933 </color>
+    <color name="active_button"> #0000AA </color>
+    <color name="border"> #666666 </color>
+    
+    <color name="radio_checked"> #D2823C </color>
+    <color name="radio_unchecked"> #FCDEAD </color>
+
+</resources>

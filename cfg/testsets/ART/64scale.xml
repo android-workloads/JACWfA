@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+	<conf name="timeUnits" value="second" />
+	<include file="64kernels/dmath.xml" />
+	<include file="64kernels/fmath.xml" />
+	<include file="64kernels/jni.xml" />
+	<include file="64kernels/sort.xml" />
+	<include file="64kernels/xphysics.xml" />
+</mttest>

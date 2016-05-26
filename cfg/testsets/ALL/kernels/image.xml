@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+
+<conf name="timeUnits" value="minute" />
+
+<workload name="com.intel.JACW.image.BinaryImage">
+    <option name="repeats" value="15" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.BlurGaussian">
+    <option name="repeats" value="2" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.BlurMean">
+    <option name="repeats" value="5" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.BlurMedian">
+    <option name="repeats" value="2" />
+    <option name="goldenFileName" value="street_small.pgm" />
+</workload>
+
+
+
+<workload name="com.intel.JACW.image.DenoiseBayes">
+    <option name="repeats" value="3" />
+    <option name="goldenFileName" value="street_small.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.DenoiseSure">
+    <option name="repeats" value="3" />
+    <option name="goldenFileName" value="street_small.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.DenoiseVisu">
+    <option name="repeats" value="3" />
+    <option name="goldenFileName" value="street_small.pgm" />
+</workload>
+
+
+
+<workload name="com.intel.JACW.image.DetectEdges">
+    <option name="repeats" value="1" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.DetectPoints">
+    <option name="repeats" value="2" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.DFT">
+    <option name="repeats" value="1" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+
+
+<workload name="com.intel.JACW.image.EnhancementHistogram">
+    <option name="repeats" value="15" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.EnhancementSharpen4">
+    <option name="repeats" value="15" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.EnhancementSharpen8">
+    <option name="repeats" value="10" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+
+
+<workload name="com.intel.JACW.image.FitEllipse">
+    <option name="repeats" value="2" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.RGBtoLAB">
+    <option name="repeats" value="5" />
+    <option name="goldenFileName" value="street_small.pgm" />
+</workload>
+
+<workload name="com.intel.JACW.image.RGBtoXYZ">
+    <option name="repeats" value="5" />
+    <option name="goldenFileName" value="street_large.pgm" />
+</workload>
+
+</mttest>

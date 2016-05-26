@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/cl_header_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/config_title"
+            android:textColor="@color/default_text"
+            android:textSize="@dimen/text_size_page_header" />
+
+    <ScrollView
+        android:id="@+id/cl_scroll_wrap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cl_header_text" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/default_padding"
+            android:orientation="vertical" >
+                
+                <TextView
+                    android:id="@+id/cl_threads_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:paddingLeft="@dimen/double_padding"
+                    android:text="@string/num_threads_chooser"
+                    android:textColor="@color/default_text"
+                    android:textSize="@dimen/text_size_header" />
+
+     <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/border_width"
+                android:background="@color/border"
+                android:layout_marginTop="@dimen/default_padding"
+                android:layout_marginBottom="@dimen/default_padding"
+                android:orientation="vertical" />
+                
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/double_padding" >
+
+                <Button
+                    android:id="@+id/cl_threads_decrease_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="15sp"
+                    android:minWidth="15sp"
+                    android:text="@string/minus"
+                    android:textColor="@color/default_text"
+                    android:textSize="@dimen/text_size_header" />
+
+                <TextView
+                    android:id="@+id/cl_threads_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginRight="10sp"
+                    android:layout_toRightOf="@id/cl_threads_decrease_button"
+                    android:gravity="center"
+                    android:minHeight="25sp"
+                    android:minWidth="25sp"
+                    android:textColor="@color/default_text"
+                    android:textSize="@dimen/text_size_page_header" />
+
+                <Button
+                    android:id="@+id/cl_threads_increase_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    
+                    android:layout_toRightOf="@+id/cl_threads_count"
+                    android:minHeight="15sp"
+                    android:minWidth="15sp"
+                    android:text="@string/plus"
+                    android:textColor="@color/default_text"
+                    android:textSize="@dimen/text_size_header" />
+            </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginRight="@dimen/default_padding"
+                        android:paddingLeft="@dimen/double_padding"
+                        android:text="@string/suite_chooser"
+                        android:textSize="@dimen/text_size_header" />
+                    
+     <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/border_width"
+                android:background="@color/border"
+                android:layout_marginTop="@dimen/default_padding"
+                android:layout_marginBottom="@dimen/default_padding"
+                android:orientation="vertical" />
+                    
+                    <RadioGroup
+                        android:id="@+id/cl_suite_choser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginRight="@dimen/default_padding"
+                        android:paddingLeft="@dimen/double_padding"
+                        android:text="@string/accuracy_chooser"
+                        android:textSize="@dimen/text_size_header" />
+                    
+     <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/border_width"
+                android:background="@color/border"
+                android:layout_marginTop="@dimen/default_padding"
+                android:layout_marginBottom="@dimen/default_padding"
+                android:orientation="vertical" />
+                    
+                    <RadioGroup
+                        android:id="@+id/cl_accuracy_chooser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                    
+     <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/border_width"
+                android:background="@color/border"
+                android:layout_marginTop="@dimen/default_padding"
+                android:layout_marginBottom="@dimen/default_padding"
+                android:orientation="vertical" />
+                    
+                    <TextView
+                        android:id="@+id/cl_testset_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/default_padding"
+                        android:paddingTop="@dimen/default_padding" />
+                    
+                    <include
+                        android:id="@+id/cl_time_expected"
+                        layout="@layout/config_details_property"
+                        android:paddingLeft="10sp" />
+
+                    <include
+                        android:id="@+id/cl_details_stage_warmup"
+                        layout="@layout/config_details_property"
+                        android:paddingLeft="10sp" />
+
+                    <include
+                        android:id="@+id/cl_details_stage_steady"
+                        layout="@layout/config_details_property"
+                        android:paddingLeft="10sp" />
+
+                    <include
+                        android:id="@+id/cl_details_stage_sync"
+                        layout="@layout/config_details_property"
+                        android:paddingLeft="10sp" />
+        
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

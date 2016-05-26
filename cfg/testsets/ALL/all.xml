@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+	<conf name="timeUnits" value="second" />
+	<include file="kernels/html.xml" />
+	<include file="kernels/pdf.xml" />
+	<include file="kernels/xphysics.xml" />
+	<include file="kernels/ai.xml" />
+	<include file="kernels/image.xml" />
+	<include file="kernels/dmath.xml" />
+	<include file="kernels/fmath.xml" />
+	<include file="kernels/jni.xml" />
+	<include file="kernels/sort.xml" />
+	<include file="kernels/lphysics.xml" />
+	<include file="kernels/compression.xml" />
+</mttest>

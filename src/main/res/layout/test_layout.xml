@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+<RelativeLayout
+            android:id="@+id/tl_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true">
+
+        <ProgressBar
+            android:id="@+id/tl_progress_bar"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_centerInParent="true"
+            android:progress="0"
+            android:max="100"
+            android:rotation="270"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:indeterminate="false"
+            android:progressDrawable="@drawable/progress_circular" />
+
+       <Button
+            android:id="@+id/tl_start"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:padding="@dimen/double_padding"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle_button"
+            android:textColor="@drawable/circle_button_textcolor"
+            android:textStyle="bold"
+            android:textSize="@dimen/text_size_page_header" />
+
+</RelativeLayout>
+
+    <TextView
+        android:id="@+id/tl_additional_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/tl_frame"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/text_size_small"
+        android:visibility="gone" />
+
+<RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/tl_additional_info">
+       
+        <ListView
+            android:id="@+id/tl_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+             />
+        
+     <TextView
+		android:id="@+id/rl_when_list_empty"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/wait_hint"
+		android:layout_centerInParent="true"
+		android:textSize="@dimen/text_size_page_header"
+		android:textAppearance="?android:textAppearanceSmall"
+		android:visibility="gone" />
+
+</RelativeLayout>
+     
+</RelativeLayout>

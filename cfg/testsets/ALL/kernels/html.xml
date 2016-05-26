@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+
+<conf name="timeUnits" value="millisecond" />
+
+<workload name="com.intel.JACW.html.Parser">
+    <option name="repeats" value="10" />
+    <option name="goldenFileName" value="apache_en.html" />
+    <option name="baseURI" value="http://httpd.apache.org/docs/trunk/en/" />
+</workload>
+
+<workload name="com.intel.JACW.html.Parser">
+    <option name="repeats" value="5" />
+    <option name="goldenFileName" value="apache_fr.html" />
+    <option name="baseURI" value="http://httpd.apache.org/docs/trunk/fr/install.html" />
+</workload>
+
+<workload name="com.intel.JACW.html.Parser">
+    <option name="repeats" value="10" />
+    <option name="goldenFileName" value="apache_zh-cn.html" />
+    <option name="baseURI" value="http://httpd.apache.org/docs/trunk/zh-cn/handler.html" />
+</workload>
+
+
+</mttest>

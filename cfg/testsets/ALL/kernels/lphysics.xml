@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+
+<conf name="timeUnits" value="second" />
+
+<workload name="com.intel.JACW.lphysics.BreakingTheTower">
+    <option name="repeats" value="1"/>
+</workload>
+
+<workload name="com.intel.JACW.lphysics.BreakingTheWall">
+    <option name="repeats" value="1"/>
+</workload>
+
+<workload name="com.intel.JACW.lphysics.Domino">
+    <option name="repeats" value="1"/>
+</workload>
+
+<workload name="com.intel.JACW.lphysics.FallingBall">
+    <option name="repeats" value="1"/>
+</workload>
+
+<workload name="com.intel.JACW.lphysics.Gyroscope">
+    <option name="repeats" value="1"/>
+</workload>
+
+<workload name="com.intel.JACW.lphysics.Ragdoll">
+    <option name="repeats" value="1"/>
+</workload>
+
+</mttest>

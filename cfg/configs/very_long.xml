@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<mttest>
+	<name value="very-precisely" />
+	<conf name="rampUp" value="6000" />
+	<conf name="duration" value="900000" />
+	<conf name="rampDown" value="5000" />
+	<conf name="isValidating" value="false"/>
+</mttest>
