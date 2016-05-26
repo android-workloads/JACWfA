@@ -118,7 +118,7 @@ case $COMMAND in
 		echo "    * see README for details"
 		echo ""
         echo "   Supported test groups:"
-        cat ./README.txt |grep "++"
+        cat ./README.md |grep "++"
 		
 	;;
 esac
