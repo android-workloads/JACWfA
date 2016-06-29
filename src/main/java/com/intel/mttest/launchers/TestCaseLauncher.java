@@ -22,7 +22,7 @@ public class TestCaseLauncher {
 		if(!checkOS()) {
 			return null;
 		}
-		int threadCount = config.threads;
+		int threadCount = config.threads[0];
 		TestCaseThread[] testThreads = new TestCaseThread[threadCount];
 		
 		for (int i = 0; i < threadCount; i++) {
@@ -55,6 +55,7 @@ public class TestCaseLauncher {
 				if(Thread.currentThread().isInterrupted()) {
 					throw new InterruptedException();
 				}
+				
 				for(TestCaseThread thread : threads) {
 					thread.start();
 				}

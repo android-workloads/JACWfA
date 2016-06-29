@@ -1,23 +1,6 @@
 package com.intel.mttest.android.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.intel.mttest.android.R;
-import com.intel.mttest.android.StarterActivity;
-import com.intel.mttest.android.results.ResultsListAdapter;
-import com.intel.mttest.cmd.MttestModel;
-import com.intel.mttest.config.ConfigParams.Field;
-import com.intel.mttest.exception.MTTestException;
-import com.intel.mttest.reporter.ActivityReporter;
-import com.intel.mttest.reporter.EventType;
-import com.intel.mttest.reporter.MttestMessage;
-import com.intel.mttest.reporter.Observable;
-import com.intel.mttest.reporter.Observer;
-import com.intel.mttest.reporter.ActivityReporter.Result;
-import com.intel.mttest.representation.Summary;
-import com.intel.mttest.representation.TestSet;
-import com.intel.mttest.representation.TestSetSummary;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -30,10 +13,27 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.intel.mttest.android.R;
+import com.intel.mttest.android.StarterActivity;
+import com.intel.mttest.android.adapters.RunModesListAdapter;
+import com.intel.mttest.android.adapters.TestGroupsListAdapter;
+import com.intel.mttest.cmd.MttestModel;
+import com.intel.mttest.config.ConfigParams.Field;
+import com.intel.mttest.exception.MTTestException;
+import com.intel.mttest.reporter.ActivityReporter;
+import com.intel.mttest.reporter.EventType;
+import com.intel.mttest.reporter.MttestMessage;
+import com.intel.mttest.reporter.Observable;
+import com.intel.mttest.reporter.Observer;
+import com.intel.mttest.representation.Summary;
+import com.intel.mttest.representation.TestSet;
+import com.intel.mttest.representation.TestSetSummary;
 
 public class TestFragment extends Fragment implements Observer {
 
@@ -45,11 +45,13 @@ public class TestFragment extends Fragment implements Observer {
 	private ProgressBar progress;
 	private Button start;
 	private ListView list;
+	private ExpandableListView listRunningResults;
 
 	private TextView additionalInfo;
-	protected ResultsListAdapter resultsAdapter;
+	protected RunModesListAdapter intermediateAdapter;
 	private static ActivityReporter reporter = new ActivityReporter();
-
+	static Bundle staticBundle;
+	
 	protected Handler updaterHandler = new Handler(Looper.getMainLooper()) {
 		@Override
 		public void handleMessage(Message arg) {
@@ -63,11 +65,12 @@ public class TestFragment extends Fragment implements Observer {
 		setHasOptionsMenu(true);
 
 		adapter = new TestGroupsListAdapter(getActivity(), updaterHandler);
-		resultsAdapter = new ResultsListAdapter(this.getActivity());
+		intermediateAdapter = new RunModesListAdapter(this.getActivity());
 
 		model = MttestModel.instance();
 		model.addObserver(this);
 		model.addSuiteObserver(this);
+		staticBundle = new Bundle();
 	};
 
 	@Override
@@ -84,7 +87,6 @@ public class TestFragment extends Fragment implements Observer {
 		progress = (ProgressBar) getView().findViewById(R.id.tl_progress_bar);
 
 		list = (ListView) getView().findViewById(R.id.tl_list);
-		list.setEmptyView(getView().findViewById(R.id.rl_when_list_empty));
 		OnItemClickListener itemClickListener = new OnItemClickListener() {
 
 			@Override
@@ -99,15 +101,31 @@ public class TestFragment extends Fragment implements Observer {
 			}
 		};
 		list.setOnItemClickListener(itemClickListener);
-
+		
+		listRunningResults = (ExpandableListView) getView().findViewById(R.id.tl_list_res);
+		View v = getView().findViewById(R.id.tl_when_list_empty);
+		listRunningResults.setEmptyView(v);
+		listRunningResults.setSaveEnabled(true);
+		v.setVisibility(View.GONE);
+		
 		additionalInfo = (TextView) getView().findViewById(
 				R.id.tl_additional_info);
 	}
 
+	static Summary latestSummary = null;
+	
+	synchronized public void checkSummary(Summary newSummary) {
+	    if(newSummary != latestSummary) {
+	        latestSummary = newSummary;
+	        staticBundle = new Bundle();
+	        intermediateAdapter.resetMapping();
+	    }
+	}
 	@Override
 	public void onResume() {
 		super.onResume();
 		TestSetSummary summary = model.getSummary();
+		checkSummary(summary);
 		if (summary == null || summary.isDone()) {
 			list.setAdapter(adapter);
 			adapter.updateData(model.getPickedTestSet());
@@ -119,14 +137,23 @@ public class TestFragment extends Fragment implements Observer {
 				pick = adapter.getPickedMask();
 				testSetWasChanged = false;
 			}
+			list.setVisibility(View.VISIBLE);
+			listRunningResults.setVisibility(View.GONE);
 		} else {
-			list.setAdapter(resultsAdapter);
+			listRunningResults.setAdapter(intermediateAdapter);
+			listRunningResults.setVisibility(View.VISIBLE);
+			list.setVisibility(View.GONE);
+		}
+		try {
+		    onViewStateRestoredLocal(staticBundle);
+		} catch (Throwable e) {
 		}
 		updateStatus();
 	}
 
 	protected void updateStatus() {
 		TestSetSummary summary = model.getSummary();
+        checkSummary(summary);
 		if (summary == null || summary.isDone()) {
 			updateDefault();
 		} else {
@@ -146,8 +173,10 @@ public class TestFragment extends Fragment implements Observer {
 							Toast.LENGTH_LONG).show();
 					return;
 				}
+				listRunningResults.setVisibility(View.VISIBLE);
+				list.setVisibility(View.GONE);
 
-				list.setAdapter(resultsAdapter);
+				listRunningResults.setAdapter(intermediateAdapter);
 				pick = adapter.getPickedMask();
 
 				Toast.makeText(ctx,
@@ -181,24 +210,9 @@ public class TestFragment extends Fragment implements Observer {
 			}
 		});
 		progress.setProgress((int) summary.getProgress());
-
-		ArrayList<Summary> subSummaries = new ArrayList<Summary>(
-				summary.getSubSummaries());
-		TestSetSummary localRoot = null;
-		for (Summary ss : subSummaries) {
-			if (ss instanceof TestSetSummary) {
-				localRoot = (TestSetSummary) ss;
-			}
-		}
-
-		if (localRoot != null) {
-			ArrayList<Result> resGroups = reporter.getGroups(localRoot);
-			ArrayList<Result> resTests = reporter.getTests(localRoot);
-			resultsAdapter.update(resGroups, resTests);
-		}
+		intermediateAdapter.updateWithSorting(summary, reporter);
 		try {
-			int t = Integer.parseInt(summary.getSource().getConfigParams()
-					.getValue(Field.threads));
+			String t = summary.getSource().getConfigParams().getValue(Field.threads);
 			additionalInfo.setText("num threads: " + t + "\n"
 					+ "precision mode: " + model.getPickedConfig().getName());
 			additionalInfo.setVisibility(View.VISIBLE);
@@ -213,7 +227,7 @@ public class TestFragment extends Fragment implements Observer {
 		StarterActivity act = (StarterActivity) getActivity();
 		if (act != null) {
 			act.setConfigureVisible(false);
-		}
+		}		
 	}
 
 	@Override
@@ -248,6 +262,51 @@ public class TestFragment extends Fragment implements Observer {
 	public void onPause() {
 		super.onPause();
 		pick = adapter.getPickedMask();
+		staticBundle = new Bundle();
+		onSaveInstanceStateLocal(staticBundle);
 	}
 
+	
+	//------------------------
+	final String expandedGroupsBundleName="expandedGroups";
+//	@Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        onSaveInstanceStateLocal(outState);
+//	}
+
+
+	
+    synchronized public void onSaveInstanceStateLocal(Bundle outState) {    
+	    ArrayList<Integer> expandedGroups = new ArrayList<Integer>();
+	    if(listRunningResults != null) {
+	        int sz = listRunningResults.getCount();
+	        for(int groupPos = 0; groupPos < sz; groupPos++) {
+	            if(listRunningResults.isGroupExpanded(groupPos)) {
+	                expandedGroups.add(groupPos);
+        	        intermediateAdapter.saveExpanded(groupPos);
+	            }
+	        }
+	        outState.putIntegerArrayList(expandedGroupsBundleName, expandedGroups);
+	    }
+	}
+	
+//	@Override
+//    public void onViewStateRestored(Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//        if(savedInstanceState != null)
+//            onViewStateRestoredLocal(savedInstanceState);
+//	    
+//	}
+	synchronized public void onViewStateRestoredLocal(Bundle savedInstanceState) {
+	    if(intermediateAdapter != null) {
+	        ArrayList<Integer> expandedGroups = savedInstanceState.getIntegerArrayList(expandedGroupsBundleName);
+	        if(expandedGroups != null) {
+    	        for(int groupPos : expandedGroups) {
+    	            listRunningResults.expandGroup(groupPos);
+    	            intermediateAdapter.restoreExpanded(groupPos);
+    	        }
+	        }
+	    }
+	}
 }

@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import com.intel.mttest.cmd.MTTestRunner;
 import com.intel.mttest.config.ConfigParams.Field;
 import com.intel.mttest.exception.MTTestException;
 import com.intel.mttest.representation.Summary;
@@ -56,8 +55,7 @@ public class CSVReporter {
 	
 	
     public void report(ILog logger, boolean recursive) throws MTTestException {
-        TestSetSummary local = (TestSetSummary) (rootSummary.getSubSummaries().get(0));
-		ArrayList<String> results = build(local, recursive);
+		ArrayList<String> results = build(rootSummary, recursive);
 		for(String s : results)
 			logger.noTag(s);
 	}
@@ -75,7 +73,6 @@ public class CSVReporter {
     }
 	public ArrayList<String> build(Summary summary, boolean recursive) throws MTTestException {
 		ArrayList<String> result = new ArrayList<String>();
-		
 		if(!(summary instanceof TestSetSummary)) {
 			return result;
 		}
@@ -107,7 +104,7 @@ public class CSVReporter {
 				if(!(subSummary instanceof TestSetSummary)) {
 					continue;
 				}
-				ArrayList<String> rec =  build(subSummary, false);
+				ArrayList<String> rec =  build(subSummary, recursive);
 				for(String s : rec)
 					result.add(s);
 			}

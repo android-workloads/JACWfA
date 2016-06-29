@@ -16,7 +16,7 @@ case "$MODE" in
 		JAVA_LIBRARY_PATH_32="-Djava.library.path=$MTTEST_PROJECT_ROOT/build/native/linux/libs/x86"
 		JAVA_LIBRARY_PATH_64="-Djava.library.path=$MTTEST_PROJECT_ROOT/build/native/linux/libs/x86_64"
 		JAVA_CLASSPATH="-cp $MTTEST_PROJECT_ROOT/build/jar/*:$MTTEST_PROJECT_ROOT/dependencies/*:$sdk_dir/platforms/$sdk_version/android.jar"
-		MTTEST_RESOURCES="-DmttestGoldensDir=./cfg/goldens -DmttestConfigDir=./cfg/configs -DmttestTestSetDir=./cfg/testsets"
+		MTTEST_RESOURCES="-DmttestAssetsDir=./assets"
 
 		RUN_RESOURCES="$JAVA_CLASSPATH"
 		RUN_COMMAND="$MTTEST_RESOURCES $MTTEST_RUNNER_CLASS $MTTEST_ARGS"
@@ -59,7 +59,7 @@ case "$MODE" in
 		JAVA_LIBRARY_PATH_32="-Djava.library.path=$MTTEST_PROJECT_ROOT/build/native/linux/libs/x86:$ANDROID_BUILD_TOP/out/host/linux-x86/lib"
 		JAVA_LIBRARY_PATH_64="-Djava.library.path=$MTTEST_PROJECT_ROOT/build/native/linux/libs/x86_64:$ANDROID_BUILD_TOP/out/host/linux-x86/lib64"
 		JAVA_CLASSPATH="-cp $MTTEST_PROJECT_ROOT/build/apk/$MTTEST_DEVICE_EXEC_NAME -Xbootclasspath:$ANDROID_BUILD_TOP/out/host/linux-x86/framework"
-		MTTEST_RESOURCES="-DmttestGoldensDir=./cfg/goldens -DmttestConfigDir=./cfg/configs -DmttestTestSetDir=./cfg/testsets"
+		MTTEST_RESOURCES="-DmttestAssetsDir=./assets"
 		rm -rf $ANDROID_DATA
 		mkdir -p $ANDROID_DATA
 		
@@ -92,7 +92,7 @@ case "$MODE" in
 		adb logcat -c
 
 		RUN_RESOURCES="$JAVA_CLASSPATH "
-		MTTEST_RESOURCES="-DmttestGoldensDir=$DEVICE_DATA_DIR/goldens -DmttestConfigDir=$DEVICE_DATA_DIR/configs -DmttestTestSetDir=$DEVICE_DATA_DIR/testsets"
+		MTTEST_RESOURCES="-DmttestAssetsDir=$DEVICE_DATA_DIR"
 		RUN_COMMAND="$MTTEST_RESOURCES $MTTEST_RUNNER_CLASS $MTTEST_ARGS"
 		RUN_PLATFORM="dalvikvm32 $JAVA_LIBRARY_PATH_32" 
 		FULL_COMMAND="cd $DEVICE_EXEC_DIR; $RUN_PLATFORM $RUN_RESOURCES $RUN_COMMAND"

@@ -155,7 +155,11 @@
         </jar>
     </target>
 
-    <target name="compile-shared">
+    <target name="dont-build-nonandroid-shared">
+        <property name="dont.build.nonandroid.shared" value="true" />
+    </target>
+
+    <target name="compile-shared" unless="dont.build.nonandroid.shared">
         <build-shared-lib-from-source dir="scripts" mode="java" destdir="${native.binaries.dir}/linux" />
     </target>
 
@@ -199,16 +203,22 @@
         </condition>
     </target>
 
+
+
+    <target name="set-build-to-product">
+        <property name="product.build" value="true" />
+    </target>
+
     <target name="start-postprocess-apk" depends="make-first-apk">
         <unzip src="${apk.dir}/${apk.unsigned.file}" dest="${apk.dir}/apk_extracted" />
         <copy todir="${apk.dir}/apk_extracted/assets/configs">
-            <fileset dir="cfg/configs"/>
+            <fileset dir="assets/configs"/>
         </copy>
         <copy todir="${apk.dir}/apk_extracted/assets/testsets">
-            <fileset dir="cfg/testsets"/>
+            <fileset dir="assets/testsets"/>
         </copy>
         <copy todir="${apk.dir}/apk_extracted/assets/goldens">
-            <fileset dir="cfg/goldens"/>
+            <fileset dir="assets/goldens"/>
         </copy>
     </target>
 
@@ -218,8 +228,45 @@
         </copy>
     </target>
 
+    <target name="copy-classes-apk" depends="start-postprocess-apk" if="product.build">
+        <unzip dest="${apk.dir}/apk_extracted">
+            <fileset dir="${dep.dir}" />
+        </unzip>
+        <delete dir="${apk.dir}/apk_extracted/META-INF" />
 
-    <target name="apk" depends="start-postprocess-apk, copy-natives-apk">
+        <unzip src="${jar.dir}/${jar.bin.file}" dest="${apk.dir}/apk_extracted"/>
+
+    </target>
+
+    <target name="copy-non-android-natives-apk" depends="compile-shared, start-postprocess-apk, copy-prebuilt-natives-apk" if="product.build">
+        <copy todir="${apk.dir}/apk_extracted/lib" includeEmptyDirs="false">
+            <fileset dir="${native.binaries.dir}/linux/libs" />
+            <globmapper from="*" to="Lin-*" />
+        </copy>
+    </target>
+
+    <target name="dont-copy-prebuilt">
+        <property name="dont.copy.prebuilt" value="true" />
+    </target>
+
+    <target name="check-if-prebuilt-needed-or-exists">
+        <condition property="no.need.to.copy.prebuilt">
+            <or>
+                <not>
+                    <available file="prebuilt" type="dir" />
+                </not>
+                <equals arg1="${dont.copy.prebuilt}" arg2="true" casesensitive="false" />
+            </or>
+        </condition>
+    </target>
+
+    <target name="copy-prebuilt-natives-apk" depends="check-if-prebuilt-needed-or-exists, start-postprocess-apk" unless="no.need.to.copy.prebuilt">
+        <copy todir="${apk.dir}/apk_extracted/lib">
+            <fileset dir="prebuilt"/>
+        </copy>
+    </target>
+
+    <target name="apk" depends="start-postprocess-apk, copy-natives-apk, copy-classes-apk, copy-non-android-natives-apk">
         <zip destfile="${apk.dir}/${apk.unsigned.file}" basedir="${apk.dir}/apk_extracted" />
         <delete dir="${apk.dir}/apk_extracted" />
     </target>
@@ -303,7 +350,8 @@
 
     <target name="buildJava" depends="jar, compile-shared"/>
     <target name="buildHost" depends="align-apk, compile-shared"/>
-    <target name="buildDevice" depends="align-apk"/>
+    <target name="buildDevice" depends="dont-build-nonandroid-shared,dont-copy-prebuilt, align-apk"/>
+    <target name="buildProduct" depends="set-build-to-product, align-apk"/>
 
     <target name="main">
         <echo level="info" message="This build file is not for direct use, please launch mttest.sh instead." />

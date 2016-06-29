@@ -24,7 +24,7 @@
         android:layout_below="@id/rl_total_results"
         android:textSize="@dimen/text_size_small" />
     
-    <ListView
+    <ExpandableListView
         android:id="@+id/rl_results_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

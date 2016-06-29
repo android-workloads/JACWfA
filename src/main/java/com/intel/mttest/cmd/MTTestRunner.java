@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.intel.mttest.representation.OS;
-import com.intel.mttest.util.GR;
 
 
 /**

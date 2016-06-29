@@ -2,32 +2,33 @@ package com.intel.mttest.android.results;
 
 import java.util.ArrayList;
 
-import com.intel.mttest.android.R;
-import com.intel.mttest.cmd.MttestModel;
-import com.intel.mttest.config.ConfigParams.Field;
-import com.intel.mttest.exception.MTTestException;
-import com.intel.mttest.reporter.ActivityReporter;
-import com.intel.mttest.reporter.EventType;
-import com.intel.mttest.reporter.MttestMessage;
-import com.intel.mttest.reporter.Observable;
-import com.intel.mttest.reporter.Observer;
-import com.intel.mttest.reporter.ActivityReporter.Result;
-import com.intel.mttest.representation.Summary;
-import com.intel.mttest.representation.TestSetSummary;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.View;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
+
+import com.intel.mttest.android.R;
+import com.intel.mttest.android.adapters.RunModesListAdapter;
+import com.intel.mttest.cmd.MttestModel;
+import com.intel.mttest.config.ConfigParams.Field;
+import com.intel.mttest.exception.MTTestException;
+import com.intel.mttest.reporter.ActivityReporter;
+import com.intel.mttest.reporter.ActivityReporter.Result;
+import com.intel.mttest.reporter.EventType;
+import com.intel.mttest.reporter.MttestMessage;
+import com.intel.mttest.reporter.Observable;
+import com.intel.mttest.reporter.Observer;
+import com.intel.mttest.representation.Summary;
+import com.intel.mttest.representation.TestSetSummary;
 
 public class ResultsFragment extends Fragment implements Observer {
 
-	protected ResultsListAdapter resultsAdapter;
-	private ListView resultsList;
+	protected RunModesListAdapter resultsAdapter;
+	private ExpandableListView resultsList;
 	private TextView additionalInfo;
 	private TextView totalResult;
 	protected MttestModel model;
@@ -49,8 +50,8 @@ public class ResultsFragment extends Fragment implements Observer {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		resultsAdapter = new ResultsListAdapter(this.getActivity());
-		resultsList = (ListView) getView().findViewById(R.id.rl_results_list);
+        resultsAdapter.clearData(this.getActivity());
+		resultsList = (ExpandableListView) getView().findViewById(R.id.rl_results_list);
 		resultsList.setAdapter(resultsAdapter);
 		resultsList.setEmptyView(getView()
 				.findViewById(R.id.rl_when_list_empty));
@@ -67,6 +68,7 @@ public class ResultsFragment extends Fragment implements Observer {
 		model = MttestModel.instance();
 		model.addObserver(this);
 		model.addSuiteObserver(this);
+        resultsAdapter = new RunModesListAdapter(this.getActivity());
 	}
 
 	@Override
@@ -75,8 +77,22 @@ public class ResultsFragment extends Fragment implements Observer {
 		updateStatus();
 	}
 
+	
+	protected static Summary lastSummary = null;
+	protected static Bundle staticBundle = new Bundle();
+	
+	synchronized protected void checkSummary(Summary newSummary) {
+        if(newSummary != lastSummary) {
+            lastSummary = newSummary;
+            staticBundle = new Bundle();
+            resultsAdapter.resetMapping();
+        }
+    }
+	
+	
 	protected void updateStatus() {
 		TestSetSummary summary = model.getSummary();
+		checkSummary(summary);
 		if (summary == null) {
 			updateDefault();
 			return;
@@ -98,8 +114,8 @@ public class ResultsFragment extends Fragment implements Observer {
 		if (localRoot != null) {
 			if (!inProgress) {
 				try {
-					int t = Integer.parseInt(summary.getSource()
-							.getConfigParams().getValue(Field.threads));
+					String t = summary.getSource()
+							.getConfigParams().getValue(Field.threads);
 					additionalInfo.setText("num threads: " + t + "\n"
 							+ "precision mode: "
 							+ model.getPickedConfig().getName());
@@ -111,11 +127,22 @@ public class ResultsFragment extends Fragment implements Observer {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				resultsAdapter.update(localRoot, reporter);
+				resultsAdapter.update(summary, reporter);
 			}
 		}
+		try {
+            onViewStateRestoredLocal(staticBundle);
+        } catch (Throwable e) {
+        }
 	}
 
+	@Override
+	public void onPause() {
+        staticBundle = new Bundle();
+        onSaveInstanceStateLocal(staticBundle);
+	    super.onPause();
+	}
+	
 	public void updateFinished(TestSetSummary summary) {
 		Result res = reporter.getGroup(summary);
 		if (res.getResult().equals("interrupted")) {
@@ -150,4 +177,32 @@ public class ResultsFragment extends Fragment implements Observer {
 		// Do nothing
 	}
 
+	final static String expandedGroupsBundleName = "expandedGroupsResults";
+	
+    synchronized public void onSaveInstanceStateLocal(Bundle outState) {    
+        ArrayList<Integer> expandedGroups = new ArrayList<Integer>();
+        if(resultsList != null) {
+            int sz = resultsList.getCount();
+            for(int groupPos = 0; groupPos < sz; groupPos++) {
+                if(resultsList.isGroupExpanded(groupPos)) {
+                    expandedGroups.add(groupPos);
+                    resultsAdapter.saveExpanded(groupPos);
+                }
+            }
+            outState.putIntegerArrayList(expandedGroupsBundleName, expandedGroups);
+        }
+    }
+    
+    synchronized public void onViewStateRestoredLocal(Bundle savedInstanceState) {
+        if(resultsAdapter != null) {
+            ArrayList<Integer> expandedGroups = savedInstanceState.getIntegerArrayList(expandedGroupsBundleName);
+            if(expandedGroups != null) {
+                for(int groupPos : expandedGroups) {
+                    resultsList.expandGroup(groupPos);
+                    resultsAdapter.restoreExpanded(groupPos);
+                }
+            }
+        }
+    }
+    
 }

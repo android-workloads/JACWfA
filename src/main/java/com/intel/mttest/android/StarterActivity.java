@@ -41,10 +41,11 @@ public class StarterActivity extends FragmentActivity implements Observer { // F
 	private TabWidget tabWidget;
 	private boolean configureVisible;
 
+    TabSpec test, results;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		// turn screen on and lock
 		{
 			this.getWindow()
@@ -71,18 +72,28 @@ public class StarterActivity extends FragmentActivity implements Observer { // F
 				android.R.id.tabcontent);
 
 		{
-			TabSpec test = tabHost.newTabSpec(TEST_TAG);
+		    test = tabHost.newTabSpec(TEST_TAG);
 			test.setIndicator("Test");
 			tabHost.addTab(test, TestFragment.class, null);
 		}
 
 		{
-			TabSpec results = tabHost.newTabSpec(RESULTS_TAG);
+			results = tabHost.newTabSpec(RESULTS_TAG);
 			results.setIndicator("Results");
 			tabHost.addTab(results, ResultsFragment.class, null);
 		}
 	}
 
+	@Override
+    protected void onResume() {
+        super.onResume();
+    }
+	
+	@Override
+	    protected void onPause() {
+	        super.onPause();
+	    }
+	
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState,
 			PersistableBundle persistentState) {

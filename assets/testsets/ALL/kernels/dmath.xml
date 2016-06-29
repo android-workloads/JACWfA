@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+
+<conf name="timeUnits" value="millisecond" />
+
+<!-- integer -->
+<workload name="com.intel.JACW.dmath.ArithProgressionI">
+    <option name="repeats" value="600000" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.DijkstraI">
+    <option name="repeats" value="150" />
+    <option name="goldenFileName" value="dijkstra_200.txt" />
+</workload>
+<workload name="com.intel.JACW.dmath.DijkstraI">
+    <option name="repeats" value="7" />
+    <option name="goldenFileName" value="dijkstra_1000.txt" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.EuclidI">
+    <option name="repeats" value="300000" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.ModularArithmeticsArrayI">
+    <option name="repeats" value="100000" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.ModularArithmeticsI">
+    <option name="repeats" value="200000" />
+</workload>
+
+
+<!-- long -->
+<workload name="com.intel.JACW.dmath.ArithProgressionL">
+    <option name="repeats" value="600000" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.DijkstraL">
+    <option name="repeats" value="150" />
+    <option name="goldenFileName" value="dijkstra_200.txt" />
+</workload>
+<workload name="com.intel.JACW.dmath.DijkstraL">
+    <option name="repeats" value="7" />
+    <option name="goldenFileName" value="dijkstra_1000.txt" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.EuclidL">
+    <option name="repeats" value="300000" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.ModularArithmeticsArrayL">
+    <option name="repeats" value="100000" />
+</workload>
+
+<workload name="com.intel.JACW.dmath.ModularArithmeticsL">
+    <option name="repeats" value="200000" />
+</workload>
+
+</mttest>

@@ -26,6 +26,7 @@ public class TestSet extends MttestTest {
 	
 	public TestSet(TestSet test, TestSet owner) throws MTTestException {
 		super(test.getName(), owner, test.getConfigParams(), test.getTestParams());
+		this.alternativeName = test.getAlternativeName();
 		this.subsets = new ArrayList<TestSet>();
 		this.tests = new ArrayList<TestCase>();
 		for(TestSet sub : test.getTestSubsets()) {
@@ -38,6 +39,16 @@ public class TestSet extends MttestTest {
 		Collections.sort(tests);
 	}
 
+	public TestSet(String name, ConfigParams config, ArrayList<TestSet> tests) throws MTTestException {
+		super(name, null, config, null);
+		this.subsets = new ArrayList<TestSet>();
+		this.tests = new ArrayList<TestCase>();
+		for(TestSet test : tests) {
+			addMttestTest(new TestSet(test, this));
+		}
+		Collections.sort(subsets);		
+	}
+	
 	public void addMttestTest(MttestTest test) throws MTTestException {
 		if(this != test.getOwner()) throw new IllegalArgumentException();
 		cntTests += test.getTestCount();
@@ -150,6 +161,7 @@ public class TestSet extends MttestTest {
 	
 	protected TestSet applyConfigs(ConfigParams cfg, TestSet owner) throws MTTestException {
 		TestSet ret = new TestSet(this.getName(), owner, cfg, this.getTestParams());
+		ret.setAlternativeName(this.getAlternativeName());
 		
 		for(TestCase test : tests) {
 			TestCase tc = new TestCase(test.getName(), ret, cfg, test.getTestParams());

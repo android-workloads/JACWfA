@@ -1,8 +1,8 @@
 package com.intel.mttest.util;
 
+import java.io.File;
+
 public class StringProcessor {
-	
-	public static final String pathSeparator = "/";
 
 	public static String cutExtention(String path) {
 		String filename = getFileName(path);
@@ -13,19 +13,14 @@ public class StringProcessor {
 	}
 
 	public static String getFileName(String path) {
-		int separatorPos = path.lastIndexOf(pathSeparator);
-		if (separatorPos == -1)
-			return path;
-		return path.substring(separatorPos+1);
+		return new File(path).getName();
 	}
-	
+
 	public static String getDirectory(String path) {
-		int separatorPos = path.lastIndexOf(pathSeparator);
-		if (separatorPos == -1)
-			return path;
-		return path.substring(0, separatorPos);
+		String dir = new File(path).getParent();
+		return dir == null ? path : dir;
 	}
-	
+
 	public static String getClassnameWithoutPackage(String classname) {
 		int lastDotPos = classname.lastIndexOf('.');
 		if (lastDotPos == -1)

@@ -77,6 +77,17 @@ public class ActivityReporter {
 		return results;
 	}
 
+	public ArrayList<ArrayList<Result>> getTestsHierachicaly(TestSetSummary summary) {
+		ArrayList<ArrayList<Result>> results = new ArrayList<>();
+		if(summary != null) {
+			for(Summary subSummary : summary.getSubSummaries()) {
+				if(subSummary instanceof TestSetSummary) {
+					results.add(getTests((TestSetSummary) subSummary));
+				}
+			}
+		}
+		return results;
+	}
 	
 	public ArrayList<Result> report(TestSetSummary summary) {
 		ArrayList<Result> results = new ArrayList<Result>();
@@ -103,7 +114,8 @@ public class ActivityReporter {
 	private Result getResult(Summary summary) {
 		if(summary == null) return new Result("n/a", "n/a", null);
 		
-		String name = summary.getShortName();
+		//String name = summary.getShortName();
+		String name = summary.getAlternativeName();
 		String result = "";
 		if(summary.isDone()) {
 			TestExecutionStatus status = summary.getExecutionStatus();

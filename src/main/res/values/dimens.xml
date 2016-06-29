@@ -14,6 +14,7 @@
     
     
     <dimen name="text_size_page_header">24sp</dimen>
+    <dimen name="text_size_header1">26sp</dimen>
     <dimen name="text_size_header">22sp</dimen>
     <dimen name="text_size_common">18sp</dimen>
     <dimen name="text_size_small">14sp</dimen>

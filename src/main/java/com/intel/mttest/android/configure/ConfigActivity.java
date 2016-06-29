@@ -2,34 +2,34 @@ package com.intel.mttest.android.configure;
 
 import java.util.ArrayList;
 
-import com.intel.mttest.android.R;
-import com.intel.mttest.android.test.TestFragment;
-import com.intel.mttest.cmd.MttestModel;
-import com.intel.mttest.config.ConfigParams;
-import com.intel.mttest.representation.TestSet;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.intel.mttest.android.R;
+import com.intel.mttest.android.test.TestFragment;
+import com.intel.mttest.cmd.MttestModel;
+import com.intel.mttest.config.ConfigParams;
 import com.intel.mttest.config.ConfigParams.Field;
+import com.intel.mttest.representation.TestSet;
 
 public class ConfigActivity extends Activity {
 
 	private ArrayList<ConfigParams> configList;
 	private ConfigParams pickedConfig;
 	private TestSet rootTestSet, pickedTestSet;
-	private int threads = 1;
+	private ThreadPicker threadPicker;
 
 	protected Handler updaterHandler = new Handler(Looper.getMainLooper()) {
 		@Override
@@ -37,20 +37,14 @@ public class ConfigActivity extends Activity {
 			final MttestModel model = MttestModel.instance();
 			Object x = arg.obj;
 			if (x instanceof Integer) {
-				if (x.equals(R.id.cl_threads_increase_button)) {
-					threads++;
-				}
-				if (x.equals(R.id.cl_threads_decrease_button) && threads > 1) {
-					threads--;
-				}
-				pickedConfig.setAbsValue(Field.threads,
-						Integer.toString(threads));
+				String threadsParam = threadPicker.getCommaSeparatedValuesAsString();
+				pickedConfig.setAbsValue(Field.threads,	threadsParam);
 				model.setPickedConfig(pickedConfig);
 			}
 			if (x instanceof ConfigParams) {
 				pickedConfig = (ConfigParams) x;
-				pickedConfig.setAbsValue(Field.threads,
-						Integer.toString(threads));
+				String threadsParam = threadPicker.getCommaSeparatedValuesAsString();
+				pickedConfig.setAbsValue(Field.threads,	threadsParam);
 				model.setPickedConfig(pickedConfig);
 			}
 			if (x instanceof TestSet) {
@@ -74,14 +68,48 @@ public class ConfigActivity extends Activity {
 		this.rootTestSet = model.getRootTestSet();
 		this.pickedTestSet = model.getPickedTestSet().getTestSubsets().get(0);
 
+		ArrayList<Integer> threads = new ArrayList<>();
+
 		try {
-			threads = Integer.parseInt(pickedConfig.getValue(Field.threads));
+			for (int t : pickedConfig.getThreadsNumConfig()) {
+				threads.add(t);
+			}
 		} catch (Throwable e) {
-			threads = 1;
+			threads.add(1);
+			threads.add(ThreadPicker.sysCores);
 		}
+		// create thread pickers
+		final LinearLayout holder = (LinearLayout) findViewById(R.id.cl_main_config_holder);
+		threadPicker = new ThreadPicker(this, holder, updaterHandler, threads);
+
+		Button addRM = (Button) findViewById(R.id.cl_add_run_mode_button);
+		Button deleteRM = (Button) findViewById(R.id.cl_delete_run_mode_button);
+
+		addRM.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				if(threadPicker.numPickers() < ThreadPicker.sysCores) {
+					threadPicker.addPicker(1);
+					Message msg = new Message();
+					msg.obj = R.id.cl_add_run_mode_button;
+					updaterHandler.sendMessage(msg);
+				}
+			}
+		});
+
+		deleteRM.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				if(threadPicker.numPickers() > 1) {
+					threadPicker.deleteLastPicker();
+					Message msg = new Message();
+					msg.obj = R.id.cl_delete_run_mode_button;
+					updaterHandler.sendMessage(msg);
+				}
+			}
+		});
 
 		initRadioGroups();
-		initIncDecButtons();
 		updateStatus();
 	}
 
@@ -123,36 +151,7 @@ public class ConfigActivity extends Activity {
 
 	}
 
-	protected void initIncDecButtons() {
-		Button increase = (Button) findViewById(R.id.cl_threads_increase_button);
-		Button decrease = (Button) findViewById(R.id.cl_threads_decrease_button);
-
-		increase.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Message msg = new Message();
-				msg.obj = R.id.cl_threads_increase_button;
-				updaterHandler.sendMessage(msg);
-			}
-		});
-		decrease.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Message msg = new Message();
-				msg.obj = R.id.cl_threads_decrease_button;
-				updaterHandler.sendMessage(msg);
-			}
-		});
-	}
-
 	protected void updateStatus() {
-		{
-			TextView view = (TextView) findViewById(R.id.cl_threads_count);
-			if (view != null) {
-				view.setText(threads + "");
-			}
-		}
-
 		int totalTests = 0;
 		int timePerTest = 0;
 

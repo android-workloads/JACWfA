@@ -66,7 +66,7 @@ public class ConfigParams {
 			@Override
 			public void checkValue(String val) {
 				super.checkValue(val);
-				Integer.parseInt(val);
+				//Integer.parseInt(val);
 			}
 		},
 		numRuns("numRuns") {
@@ -131,6 +131,15 @@ public class ConfigParams {
 		return values.get(field);
 	}
 	
+	public int[] getThreadsNumConfig() throws MTTestException{
+		String[] threadsStr = getValue(ConfigParams.Field.threads).split(",");
+		int[] threads = new int[threadsStr.length];
+		for (int i = 0; i < threadsStr.length; i++) {
+			threads[i] = Integer.parseInt(threadsStr[i]);
+		}
+		return threads;
+	}
+	
 	public void setFileParam(TestParam param) throws MTTestException {
 		boolean accepted = false;
 		for(Field field : Field.values()) {
@@ -160,7 +169,12 @@ public class ConfigParams {
 	
 	private String srcFileName;
 	
-	
+
+	@SuppressWarnings("unchecked")
+	public ConfigParams(ConfigParams confs) {
+		this.values = (HashMap<Field, String>) confs.values.clone();
+		this.srcFileName = confs.srcFileName;
+	}
 	
 	public ConfigParams(String srcName) {
 		this.srcFileName = srcName;

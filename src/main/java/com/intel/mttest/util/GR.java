@@ -5,13 +5,13 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.intel.mttest.exception.MTTestException;
-import com.intel.mttest.loaders.CmdArgs;
-import com.intel.mttest.representation.OS;
-
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.util.Log;
+
+import com.intel.mttest.exception.MTTestException;
+import com.intel.mttest.loaders.CmdArgs;
+import com.intel.mttest.reporter.ILog;
+import com.intel.mttest.representation.OS;
 
 /**
  * GlobalResources. This class contains some constants.
@@ -106,10 +106,18 @@ public class GR {
 	
 	
 	public static File createResultsFile(String fileName) throws IOException {
+		if(resultsDataDir == null) {
+		    new ILog(os, null).e("Output location is not specified. Use '-output' option.");
+			return null;
+		}
 	    File folder = new File(resultsDataDir);
-	    folder.mkdirs();
+	    if(!folder.exists()) {
+	    	folder.mkdirs();
+	    }
 	    File f = new File(folder, fileName);
-	    f.createNewFile();
+	    if(!f.exists()) {
+	    	f.createNewFile();
+	    }
 	    return f;
 	}
 	
@@ -120,12 +128,23 @@ public class GR {
 	}
 	
 	protected static void initJava() {
-		goldensDir = System.getProperty("mttestGoldensDir");
-		testsetsDir = System.getProperty("mttestTestSetDir");
-		configsDir = System.getProperty("mttestConfigDir");
-//		resultsDataDir = System.getProperty("mttestResultDir") ;
+	    String assets = System.getProperty("mttestAssetsDir");
+	    if(assets == null) {
+	        assets="assets";
+	    }
+	    try {
+	        File assetsFolder= new File(assets);
+    		goldensDir = new File(assetsFolder, "goldens").getCanonicalPath();
+    		testsetsDir = new File(assetsFolder, "testsets").getCanonicalPath();
+    		configsDir = new File(assetsFolder, "configs").getCanonicalPath();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("Can not access resources at: " + assets);
+	    }
+
+//		resultsDataDir = System.getProperty("mttestResultDir");
 		if(goldensDir == null || testsetsDir == null || configsDir == null) {
-			throw new RuntimeException("Environment was not properly setted: goldens=" + goldensDir + " suite=" + testsetsDir + " cfg=" + configsDir);
+			throw new RuntimeException("Environment was not properly setted: goldensDir=" + goldensDir + " testsetsDir=" + testsetsDir + " configsDir=" + configsDir);
 		}
 	}
 	

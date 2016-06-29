@@ -32,7 +32,8 @@ public class PlainTableReporter {
 		for(String s : results) {
 		    if(s.trim().length() == 0) continue;
 		    if(s.equals(prev)) continue;
-		    logger.i(prev = s);
+		    logger.i(s);
+		    prev = s;
 		}
 	}
 	
@@ -118,7 +119,7 @@ public class PlainTableReporter {
 	
 	ArrayList<String> getTestSetSummaryScoreString(TestSetSummary summary) {
 		ArrayList<String> ret = new ArrayList<String>();
-		addField(ret, summary.getSource().getFullName(), 1);
+		addField(ret, summary.getSource().getAlternativeFullName(), 1);
 		addField(ret, StringProcessor.formatDouble(summary.getScore(), 5), 1);
 		addField(ret, summary.getExecutionStatus().toString(), 2);
 		addField(ret, StringProcessor.formatDouble(summary.getTotalTimeInProgressMs() / 1000.0, 2) + " sec", 3);

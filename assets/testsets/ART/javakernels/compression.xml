@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<mttest version="0.1" >
+
+<conf name="timeUnits" value="minute" />
+
+<workload name="com.intel.JACW.compression.BZip2">
+    <option name="repeats" value="5" />
+    <option name="goldenFileName" value="apache_en.html" />
+</workload>
+<workload name="com.intel.JACW.compression.BZip2">
+    <option name="repeats" value="1" />
+    <option name="goldenFileName" value="street_large.jpg" />
+</workload>
+
+<workload name="com.intel.JACW.compression.Tar">
+    <option name="repeats" value="300" />
+    <option name="goldenFileName" value="apache.pdf" />
+</workload>
+
+<workload name="com.intel.JACW.compression.XZ">
+    <option name="repeats" value="10" />
+    <option name="goldenFileName" value="apache_en.html" />
+</workload>
+<workload name="com.intel.JACW.compression.XZ">
+    <option name="repeats" value="1" />
+    <option name="goldenFileName" value="street_large.jpg" />
+</workload>
+</mttest>

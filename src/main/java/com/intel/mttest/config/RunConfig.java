@@ -13,7 +13,7 @@ public class RunConfig {
 	public long rampDownMillis;
 	public boolean isValidating;
 	public TimeUnits timeUnits;
-	public int threads;
+	public int[] threads;
 	public OS os;
 
 	public TestParams commonParams;
@@ -78,7 +78,7 @@ public class RunConfig {
 		}
 
 		isValidating = Boolean.parseBoolean(config.getValue(ConfigParams.Field.isValidating));
-		threads = Integer.parseInt(config.getValue(ConfigParams.Field.threads));
+		threads = config.getThreadsNumConfig();
 		rampUpMillis = Long.parseLong(config.getValue(ConfigParams.Field.rampUp));
 		durationMillis = Long.parseLong(config.getValue(ConfigParams.Field.duration));
 		rampDownMillis = Long.parseLong(config.getValue(ConfigParams.Field.rampDown));

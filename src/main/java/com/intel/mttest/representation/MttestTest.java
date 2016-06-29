@@ -9,19 +9,34 @@ import com.intel.mttest.util.Identifiable;
 public abstract class MttestTest extends Identifiable {
  
 	protected String name;
+	protected String alternativeName;
 	protected TestSet owner;
 	protected TestParams params;
 	protected ConfigParams config;
-	
+
 	public MttestTest(String name, TestSet owner, ConfigParams config, TestParams params) throws MTTestException{
 		this.name = name;
 		this.owner = owner;
 		this.config = config;
 		this.params = params;
+		this.alternativeName = this.getShortName();
+	}
+	
+	public MttestTest(String name, String alternativeName, TestSet owner, ConfigParams config, TestParams params) throws MTTestException{
+		this(name, owner, config, params);
+		this.alternativeName = alternativeName;
 	}
 
 	public boolean isRoot() {
 		return owner == null;
+	}
+
+	public void setAlternativeName(String alternativeName) {
+		this.alternativeName = alternativeName;
+	}
+	
+	public String getAlternativeName() {
+		return alternativeName;
 	}
 	
 	public String getName() {
@@ -43,6 +58,11 @@ public abstract class MttestTest extends Identifiable {
 	public final String getFullName() {
 		return (owner == null ? "" : (owner.getFullName() + ":")) + getName();
 	}
+
+	public final String getAlternativeFullName() {
+		return (owner == null ? "" : (owner.getFullName() + ":")) + getAlternativeName();
+	}
+	
 	public abstract int getTestCount();
 
 	public String getShortName() {

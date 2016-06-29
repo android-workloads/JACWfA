@@ -1,8 +1,5 @@
 package com.intel.mttest.representation;
 
-
-import java.security.acl.Owner;
-
 import com.intel.mttest.config.RunConfig;
 import com.intel.mttest.config.TimeUnits;
 import com.intel.mttest.exception.MTTestException;
@@ -98,6 +95,15 @@ public class TestCaseSummary extends Summary {
 		return ret;
 	}
 
+	@Override
+	public String getAlternativeName() {
+		String ret = super.getAlternativeName();
+		if(getRunConfig().hasGoldenFile()) {
+			ret += " (" + getRunConfig().getGoldenFile() + ")";
+		}
+		return ret;
+	}
+	
     public TestSetSummary getRoot() {
         return this.owner.getRoot();
     }	

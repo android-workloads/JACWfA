@@ -51,7 +51,12 @@ Project_dir/cfg/
 
 * Build
 
-    ./mttest.sh build -m [Java|Host|Device] (to make build run faster you may want to give Java more memory, eg "export _JAVA_OPTIONS: -Xmx2g" before the build)
+    ./mttest.sh build -m [Java|Host|Device|Product] (to make build run faster you may want to give Java more memory, eg "export _JAVA_OPTIONS: -Xmx2g" before the build)
+    NOTE: How build product APK with your own prebuilt libraries (for example, DLLs)
+        1. Before use './mttest.sh build' go to ./src/main/jni
+        2. Build the contents into *.dll yorself using apropriate compiler
+        3. Create a folder if not exists with name 'prebuilt' and put dlls there
+        4. After all you can use './mttest.sh build -m Product' and they will be automatically picked up
 
 * Use mttest.sh - this is major script to use Java* ACW for Android*.
 

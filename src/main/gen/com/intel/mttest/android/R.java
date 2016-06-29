@@ -92,16 +92,17 @@ containing a value of this type.
         /**  Default screen margins, per the Android Design guidelines. 
          */
         public static final int border_width=0x7f060000;
-        public static final int button_corner=0x7f06000b;
-        public static final int default_background_stroke_width=0x7f06000d;
+        public static final int button_corner=0x7f06000c;
+        public static final int default_background_stroke_width=0x7f06000e;
         public static final int default_padding=0x7f060004;
-        public static final int default_stroke_width=0x7f06000c;
+        public static final int default_stroke_width=0x7f06000d;
         public static final int double_padding=0x7f060005;
         public static final int small_padding=0x7f060003;
-        public static final int text_size_common=0x7f060009;
-        public static final int text_size_header=0x7f060008;
+        public static final int text_size_common=0x7f06000a;
+        public static final int text_size_header=0x7f060009;
+        public static final int text_size_header1=0x7f060008;
         public static final int text_size_page_header=0x7f060007;
-        public static final int text_size_small=0x7f06000a;
+        public static final int text_size_small=0x7f06000b;
         public static final int triple_padding=0x7f060006;
     }
     public static final class drawable {
@@ -117,6 +118,8 @@ containing a value of this type.
     }
     public static final class id {
         public static final int cl_accuracy_chooser=0x7f0a000a;
+        public static final int cl_add_run_mode_button=0x7f0a0007;
+        public static final int cl_delete_run_mode_button=0x7f0a0008;
         public static final int cl_details_property_title=0x7f0a0001;
         public static final int cl_details_property_value=0x7f0a0002;
         public static final int cl_details_stage_steady=0x7f0a000e;
@@ -124,15 +127,16 @@ containing a value of this type.
         public static final int cl_details_stage_warmup=0x7f0a000d;
         public static final int cl_details_threads=0x7f0a0000;
         public static final int cl_header_text=0x7f0a0003;
+        public static final int cl_main_config_holder=0x7f0a0006;
         public static final int cl_scroll_wrap=0x7f0a0004;
         public static final int cl_suite_choser=0x7f0a0009;
         public static final int cl_testset_details=0x7f0a000b;
-        public static final int cl_threads_count=0x7f0a0007;
-        public static final int cl_threads_decrease_button=0x7f0a0006;
-        public static final int cl_threads_increase_button=0x7f0a0008;
+        public static final int cl_threads_count=0x7f0a0022;
+        public static final int cl_threads_decrease_button=0x7f0a0021;
+        public static final int cl_threads_increase_button=0x7f0a0023;
         public static final int cl_threads_text=0x7f0a0005;
         public static final int cl_time_expected=0x7f0a000c;
-        public static final int configure=0x7f0a001f;
+        public static final int configure=0x7f0a0024;
         public static final int rl_additional_info=0x7f0a0017;
         public static final int rl_list_br=0x7f0a0010;
         public static final int rl_results_list=0x7f0a0018;
@@ -146,8 +150,10 @@ containing a value of this type.
         public static final int tl_additional_info=0x7f0a001d;
         public static final int tl_frame=0x7f0a001a;
         public static final int tl_list=0x7f0a001e;
+        public static final int tl_list_res=0x7f0a001f;
         public static final int tl_progress_bar=0x7f0a001b;
         public static final int tl_start=0x7f0a001c;
+        public static final int tl_when_list_empty=0x7f0a0020;
     }
     public static final class layout {
         public static final int config_details_property=0x7f040000;
@@ -159,6 +165,7 @@ containing a value of this type.
         public static final int running_layout=0x7f040006;
         public static final int starter_layout=0x7f040007;
         public static final int test_layout=0x7f040008;
+        public static final int thread_picker=0x7f040009;
     }
     public static final class menu {
         public static final int main_menu=0x7f090000;

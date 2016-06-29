@@ -25,6 +25,10 @@ public abstract class Summary extends Identifiable implements Observable {
 	public String getShortName() {
 		return source.getShortName();
 	}
+
+	public String getAlternativeName() {
+		return source.getAlternativeName();
+	}
 	
 	public TestExecutionStatus getExecutionStatus() {
 		return status;

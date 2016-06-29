@@ -1,8 +1,11 @@
 package com.intel.mttest.cmd;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+
+import android.content.Context;
 
 import com.intel.mttest.config.ConfigParams;
 import com.intel.mttest.exception.MTTestException;
@@ -24,14 +27,12 @@ import com.intel.mttest.representation.TestSet;
 import com.intel.mttest.representation.TestSetSummary;
 import com.intel.mttest.util.GR;
 
-import android.content.Context;
-
 public class MttestModel implements Observable, Observer{
 	
 	
 	static public void init(OS os, Context context, PrintStream logOut, ArrayList<String> args) {
 		if(instance != null) {
-			instance.logger.e("Attepmt to reinit " + instance.getClass());
+			instance.logger.w("Attepmt to reinit " + instance.getClass());
 		} else {
 			instance = new MttestModel(os, context, logOut, args);
 		}
@@ -76,10 +77,19 @@ public class MttestModel implements Observable, Observer{
 	synchronized public boolean isRunning() {
 		return SuiteLauncher.isRunning();
 	}
-	
+
 	synchronized public boolean start() {
 		try {
-			TestSet execute = runningTestSet.applyConfig(pickedConfig);
+			ArrayList<TestSet> testsToExecute = new ArrayList<>();
+			TestSet all = runningTestSet.getTestSubsets().get(0);
+			
+			for (int i : pickedConfig.getThreadsNumConfig()) {
+				ConfigParams testConfig = new ConfigParams(pickedConfig);
+				testConfig.setAbsValue(ConfigParams.Field.threads, i + "");
+				all.setAlternativeName(all.getShortName() + " {" + i + "T}");
+				testsToExecute.add(all.applyConfig(testConfig));
+			}
+			TestSet execute = new TestSet("masterset", pickedConfig, testsToExecute);
 			SuiteLauncher.runTestSet(execute);
 		} catch (Throwable e) {
 			logger.e(e.getMessage());
@@ -119,7 +129,6 @@ public class MttestModel implements Observable, Observer{
 		try {
 			loadResources(os, context);
 		} catch (MTTestException e) {
-//			e.printStackTrace(); 
 			exitWithException(e.getShortMessage());
 		}
 		addSuiteObserver(this);
@@ -131,11 +140,11 @@ public class MttestModel implements Observable, Observer{
 
 		parser = new XMLParser(os);
 		rootTestSet = CmdParser.loadTests(parser);
-		allConfigs = CmdParser.loadConfigs(parser, cmdArgs.threadsSpecificator, cmdArgs.numRunsSpecificator);
+		allConfigs = CmdParser.loadConfigs(parser, cmdArgs);
 		
 		pickedConfig = CmdParser.pickConfig(allConfigs, cmdArgs.configsSpecificator);
 		
-		pickedTestset = CmdParser.extractTestSet(rootTestSet, null);
+		pickedTestset = CmdParser.extractTestSet(rootTestSet, cmdArgs.testsSpecificator);
 		runningTestSet = CmdParser.extractTestSet(rootTestSet, cmdArgs.testsSpecificator);
 	}
 	
@@ -176,7 +185,7 @@ public class MttestModel implements Observable, Observer{
 	@Override
 	public void update(Observable subject, EventType eventType) {
 		if(subject instanceof TestSetSummary) {
-			if(eventType.equals(EventType.FINISHED) && ((TestSetSummary) subject).isRoot()) { 
+			if(eventType.equals(EventType.FINISHED) && ((TestSetSummary) subject).isRoot()) {
 				PlainTableReporter reporter = new PlainTableReporter(cmdArgs.verbose, SuiteLauncher.getSummary());
 				ILog logger = new ILog(os, null);
 				logger.appendTAG("-res");
@@ -189,35 +198,33 @@ public class MttestModel implements Observable, Observer{
 				}
 				try {
 				    {
-    				    File csvOut = GR.createResultsFile("results.csv");
-    				    PrintStream csvStream = new PrintStream(csvOut);
-    				    ILog csvLogger = new ILog(null, csvStream);
-    				    CSVReporter csvReporter = new CSVReporter(SuiteLauncher.getSummary());
-    	                csvReporter.report(csvLogger, true);
-    	                csvStream.close();
-    	                logger.i("Please find results in:" + csvOut.getAbsolutePath());
-				    }
-				    {
                         File tableOut = GR.createResultsFile("table.txt");
                         PrintStream tableStream = new PrintStream(tableOut);
-                        ILog tableLogger = new ILog(null, tableStream);
-                        PlainTableReporter tableReporter = new PlainTableReporter(SuiteLauncher.getSummary());
+                        ILog tableLogger = new ILog(os, tableStream);
+                        PlainTableReporter tableReporter = new PlainTableReporter(getSummary());
                         tableReporter.report(tableLogger, true);
                         tableStream.close();
                         logger.i("Please find results in:" + tableOut.getAbsolutePath());
 				    }
+				    {
+    				    File csvOut = GR.createResultsFile("results.csv");
+    				    PrintStream csvStream = new PrintStream(csvOut);
+    				    ILog csvLogger = new ILog(os, csvStream);
+    				    CSVReporter csvReporter = new CSVReporter(getSummary());
+    	                csvReporter.report(csvLogger, true);
+    	                csvStream.close();
+    	                logger.i("Please find results in:" + csvOut.getAbsolutePath());
+				    }
 				} catch (Throwable e) {
                     logger.i("Unable to save result files : " + e.getMessage());
-                    e.printStackTrace();
 				}
 				
-				for(int i = 0; i < 5; i++) {
-				    try {
-	                    Thread.sleep(100);
-	                } catch (InterruptedException e) {
-	                }
-				    logger.i("MTTest testing finished.");
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					//nothing
 				}
+				logger.i("MTTest testing finished.");
 			}
 		}
 	}
@@ -226,9 +233,3 @@ public class MttestModel implements Observable, Observer{
 		// do nothing
 	}
 }
-
-
-
-
-
-

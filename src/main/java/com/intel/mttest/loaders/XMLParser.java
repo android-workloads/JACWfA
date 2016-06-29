@@ -82,11 +82,11 @@ public class XMLParser {
 		return parseTestSet(file, os, new TestParams(TestParams.defaultName), null);
 	}
 	
-	public ConfigParams parseConfig(String source, int threadsCnt, int repeatsCnt) throws MTTestException {
+	public ConfigParams parseConfig(String source, CmdArgs args) throws MTTestException {
 		File file = new File(source);
 		ConfigParams ret = parseConfig(file);
-		ret.setAbsValue(ConfigParams.Field.threads, threadsCnt + "");
-		ret.setAbsValue(ConfigParams.Field.numRuns, repeatsCnt + "");
+		ret.setAbsValue(ConfigParams.Field.threads, args.threadsSpecificator);
+		ret.setAbsValue(ConfigParams.Field.numRuns, args.numRunsSpecificator);
 		return ret; 
 	}
 	

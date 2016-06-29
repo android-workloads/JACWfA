@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<mttest version="0.1">
+
+<conf name="isValidating" value="no" />
+
+<workload name="com.intel.JACW.xphysics.Blob">
+    <option name="repeats" value="5" />
+</workload>
+
+<workload name="com.intel.JACW.xphysics.Chain">
+    <option name="repeats" value="1" />
+</workload>
+
+<workload name="com.intel.JACW.xphysics.ChainHighP">
+    <option name="repeats" value="1" />
+</workload>
+
+<workload name="com.intel.JACW.xphysics.ChainHighV">
+    <option name="repeats" value="1" />
+</workload>
+
+<workload name="com.intel.JACW.xphysics.ChainHighVP">
+    <option name="repeats" value="1" />
+</workload>
+
+<workload name="com.intel.JACW.xphysics.Domino">
+    <option name="repeats" value="1" />
+</workload>
+
+<workload name="com.intel.JACW.xphysics.DominoBullet">
+    <option name="repeats" value="1" />
+</workload>
+</mttest>

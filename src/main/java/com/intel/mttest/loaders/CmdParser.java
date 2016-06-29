@@ -14,6 +14,8 @@ import com.intel.mttest.util.GR;
 
 public class CmdParser {
 
+	private static final String masterSetName = "masterset";
+	
 	static public String getConfigParamsString(TestCase testCase) {
 		return getConfigParamsString(testCase.getConfigParams());
 	}
@@ -41,17 +43,11 @@ public class CmdParser {
 		}
 		return ret;
 	}
-	
 
-	private static final String defaultTestSet = "masterset:all";
-	private static final String masterSetName = "masterset";
-	
-	static public TestSet extractTestSet(TestSet root, String arg) throws MTTestException {
+	static public TestSet extractTestSet(TestSet root, String specs) throws MTTestException {
 		ArrayList<String> testSpecificators = new ArrayList<String>();
-		if(arg == null)
-			arg = defaultTestSet;
 		{
-			StringTokenizer st = new StringTokenizer(arg.trim(), ",", false);
+			StringTokenizer st = new StringTokenizer(specs.trim(), ",", false);
 			while(st.hasMoreTokens()) {
 				String spec = st.nextToken();
 				if(!spec.startsWith(masterSetName)) {
@@ -68,12 +64,9 @@ public class CmdParser {
 		return parser.parseTestSet((new File(GR.getTestsetDir(), masterSetName + ".xml")).getAbsolutePath());
 	}
 	
-	static public final String defaultCfg = "medium.xml"; 
+	 
 	public static ConfigParams pickConfig(ArrayList<ConfigParams> allConfigs, String spec) throws MTTestException {
 		String possibilities = "";
-		if(spec == null) {
-			spec = defaultCfg;
-		}
 		for(ConfigParams cfg : allConfigs) {
 			String name = cfg.getSourceFileName();
 			possibilities += name + " ";
@@ -84,26 +77,14 @@ public class CmdParser {
 		throw new MTTestException("No [" + spec + "] config file among: " + possibilities);
 	}
 	
-	static public ArrayList<ConfigParams> loadConfigs(XMLParser parser, String threadsStr, String repeatsStr) throws MTTestException {
-		int threadsCnt = Runtime.getRuntime().availableProcessors();
-		int repeatsCnt = 1;
-		try {
-			threadsCnt = Integer.parseInt(threadsStr);
-		} catch (Throwable e) {
-		}
-		
-		try {
-			repeatsCnt = Integer.parseInt(repeatsStr);
-		} catch (Throwable e) {
-		}
-
+	static public ArrayList<ConfigParams> loadConfigs(XMLParser parser, CmdArgs cmdArgs) throws MTTestException {
 		ArrayList<ConfigParams> testConfigs = new ArrayList<ConfigParams>();
 		ArrayList<String> configSpecificators = new ArrayList<String>();
 		configSpecificators = GR.getSubFilesName(GR.getConfigDir());
 		
 		for(String name : configSpecificators) {
 			File src = new File(GR.getConfigDir(), name);
-			testConfigs.add(parser.parseConfig(src.getPath(), threadsCnt, repeatsCnt));
+			testConfigs.add(parser.parseConfig(src.getPath(), cmdArgs));
 		}
 		return testConfigs;
 	}

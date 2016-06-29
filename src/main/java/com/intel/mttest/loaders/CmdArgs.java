@@ -31,7 +31,7 @@ public class CmdArgs {
 			extractValue(args, index);
 			testsSpecificator = extractValue(args, index);
 		} else {
-			testsSpecificator = null;
+			testsSpecificator = "masterset:all"; // default value
 		}
 
 		if(args.contains("-c")) {
@@ -39,23 +39,26 @@ public class CmdArgs {
 			extractValue(args, index);
 			configsSpecificator = extractValue(args, index);
 		} else {
-			configsSpecificator = null;
+			configsSpecificator = "medium.xml"; // default value
 		}
 		
 		if(args.contains("-t")) {
 			int index = args.indexOf("-t");
 			extractValue(args, index);
-			threadsSpecificator = extractIntValue(args, index) + "";
+			threadsSpecificator = extractThreadNumValue(args, index);
 		} else {
-			threadsSpecificator = null;
+			// default value
+			threadsSpecificator = Integer.toString(1)
+					+ "," 
+					+ Integer.toString(Runtime.getRuntime().availableProcessors());
 		}
 		
 		if(args.contains("-n")) {
             int index = args.indexOf("-n");
             extractValue(args, index);
-            numRunsSpecificator = extractIntValue(args, index) + "";
+            numRunsSpecificator = Integer.toString(extractIntValue(args, index));
         } else {
-            numRunsSpecificator = null;
+            numRunsSpecificator = "1"; // default value
         }
 		
 		if(args.contains("-output")) {
@@ -81,6 +84,43 @@ public class CmdArgs {
 		}
 		return ret;
 	}
+
+	private static String extractThreadNumValue(ArrayList<String> args, int index) {
+		String s = extractValue(args, index);
+		String[] tVals = s.split(",");
+		String result = "";
+		for (int i = 0; i < tVals.length; i++) {
+			if (i > 0) {
+				result += ",";
+			}
+			try {
+				int tVal = Integer.parseInt(tVals[i]);
+				if (tVal > Runtime.getRuntime().availableProcessors()
+						|| tVal < 1) {
+					throw new IllegalArgumentException(
+							"Command line arguments: expected int in range 1.."
+									+ Runtime.getRuntime()
+											.availableProcessors()
+									+ " or 'sysCores' instead of '" + tVals[i]
+									+ "' in '" + s + "'");
+				}
+				result += tVal;
+			} catch (Throwable e) {
+				if (tVals[i].equals("sysCores")) {
+					result += "" + Runtime.getRuntime().availableProcessors();
+				} else {
+					throw new IllegalArgumentException(
+							"Command line arguments: expected int in range 1.."
+									+ Runtime.getRuntime()
+											.availableProcessors()
+									+ " or 'sysCores' instead of '" + tVals[i]
+									+ "' in '" + s + "'");
+				}
+			}
+		}
+		return result.toString();
+	}
+
 	private static String extractValue(ArrayList<String> args, int index) {
 		if (index >= args.size()) {
 			throw new IllegalArgumentException("Command line arguments: value was not defined.");

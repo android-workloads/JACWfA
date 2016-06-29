@@ -21,6 +21,7 @@ public class TestCase extends MttestTest {
 		
 	public TestCase(TestCase test, TestSet owner) throws MTTestException {
 		super(test.getName(), owner, test.getConfigParams(), test.getTestParams());
+		this.alternativeName = test.alternativeName;
 		testClass = loadClass(this.name);
 	}
 	

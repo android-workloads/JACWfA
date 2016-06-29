@@ -23,7 +23,7 @@ public class ILog {
 	
 	public void i(String message) { 
 		if(out != null) {
-			out.println(TAG + "    " + message);			
+			out.println(TAG + "    " + message);
 		} else { 
 			Log.i(TAG, message);
 		}
