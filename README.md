@@ -23,14 +23,26 @@ Project_dir/cfg/
 ### How to run Java* ACW for Android*: 
 
 #### User mode 
+
+##### GUI
+
 - download and run JavaACW-<Version>.apk, use GUI to navigate
 
-    install: adb install -r ./JavaACW-1.0.apk (uninstall old version first if error happened: adb uninstall com.intel.mttest.android )
+    install: adb install -r ./JavaACW-<Release>.apk (uninstall old version first if error happened: adb uninstall com.intel.mttest.android )
 
     run:
 
         * use GUI to startup application
         * or run from command line: adb shell "am start -S -n com.intel.mttest.android/com.intel.mttest.android.StarterActivity -e autostart true -e -s masterset:all". See Developer mode for details
+
+##### cmd
+
+    * Go to bin folder
+
+    * extract native libraries and input files using 'jar -xf JavaACW-<Release>.apk lib/<platform>' and 'jar -xf JavaACW-<Release>.apk assets'
+        Where <platform> is one of these variants: Lin-x86, Lin-x86_64, Win-x86, Win-x86_64
+
+    * Run tests using: java -Djava.library.path=lib/<platform> -jar JavaACW-<Release>.apk -s masterset:all
 
 
 #### Developer mode 
