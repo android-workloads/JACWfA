@@ -130,7 +130,12 @@ public class ActivityReporter {
 				if(summary instanceof TestSetSummary)
 					result += summary.getTestsCompletedCount() + "/" + summary.getSource().getTestCount();
 			} else {
-				result = "waiting";
+			    result = "waiting";
+			    if(summary instanceof TestSetSummary) {
+			        Summary root = ((TestSetSummary) summary).getRoot();
+			        if(root != null && root.isDone())
+			            result = "interrupted"; 
+			    }
 			}
 		}
 		return new Result(name, result, summary.getExecutionStatus());

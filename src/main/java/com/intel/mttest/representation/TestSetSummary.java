@@ -139,6 +139,6 @@ public class TestSetSummary extends Summary {
 	}
 
     public TestSetSummary getRoot() {
-        return owner == null ? this : owner.getOwner();
+        return owner == null ? this : owner.getRoot();
     }
 }
