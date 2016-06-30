@@ -131,4 +131,5 @@ public abstract class Summary extends Identifiable implements Observable {
 		}
 		return super.compareTo(ie);
 	}
+    public abstract TestSetSummary getRoot();
 }
