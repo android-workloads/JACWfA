@@ -224,7 +224,9 @@ public class MttestModel implements Observable, Observer{
 				} catch (InterruptedException e) {
 					//nothing
 				}
-				logger.i("MTTest testing finished.");
+				for(int i = 0; i < 5; i++) {
+				    logger.i("MTTest testing finished.");
+				}
 			}
 		}
 	}
