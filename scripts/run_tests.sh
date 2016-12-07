@@ -108,7 +108,7 @@ case "$MODE" in
 		echo "mode: 64bit vm-on-device"
 		echo "adb shell $FULL_COMMAND"
 		adb shell "$FULL_COMMAND"
-        adb pull ${DEVICE_DATA_DIR}/dalvikvm_64 ./${MTTEST_RESULT_DIR}/dalvikvm_64
+        adb pull ${DEVICE_DATA_DIR}/dalvikvm_64 ${MTTEST_RESULT_DIR}/dalvikvm_64
 	;;
 	*)
 		echo "mttest.error: mode with name '$MODE' is unknown, expected mode: Java, Host, Device."
