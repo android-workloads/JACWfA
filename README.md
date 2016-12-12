@@ -140,3 +140,12 @@ Project_dir/cfg/
 
 * Look for resutls in ./results/date_stamp/
 
+#### Shrinking to single dex
+
+There was an option added to mttest.properties 
+```bash
+use_proguard=true
+```
+It is used to generate single dex apk to avoid ART compiler overhead. 
+
+
