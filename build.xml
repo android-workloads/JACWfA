@@ -28,6 +28,8 @@
 
     <property name="main-class" value="com.intel.mttest.cmd.MTTestRunner" />
     <!-- archives names -->
+    <property name="jar.bin.unshrunk.file" value="${main.file.name}-unshrunk.jar" />
+    <property name="jar.bin.shrunk.file" value="${main.file.name}-shrunk.jar" />
     <property name="jar.bin.file" value="${main.file.name}.jar" />
     <property name="jar.src.file" value="${main.file.name}-source.jar" />
     <property name="jar.doc.file" value="${main.file.name}-doc.jar" />
@@ -187,14 +189,37 @@
         </exec>
     </target>
 
-    <target name="dex" depends="jar">
+    <!-- Targets for shrinking the android app -->
+    <target name="jar-with-dependencies" depends="compile">
+        <mkdir dir="${dex.dir}" />
+        <jar basedir="${classes.dir}"  destfile="${dex.dir}/${jar.bin.unshrunk.file}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+            <zipgroupfileset dir="${dep.dir}" includes="*.jar"/>
+        </jar>
+    </target>
+
+    <target name="shrink-jar" depends="jar-with-dependencies">
+       <exec executable="bash" failonerror="true">
+            <arg value="scripts/call_proguard.sh" />
+            <arg value="proguard.properties" />
+            <arg value="${dex.dir}/${jar.bin.unshrunk.file}" />
+            <arg value="${dex.dir}/${jar.bin.shrunk.file}" />
+            <arg value="${sdk_dir}/platforms/${sdk_version}/android.jar:${java_home}/jre/lib/rt.jar:${sdk_dir}/extras/android/support/v4/android-support-v4.jar" />
+        </exec>
+       <delete file="${dex.dir}/${jar.bin.unshrunk.file}" />
+    </target>
+
+    <target name="dex" depends="shrink-jar">
         <mkdir dir="${dex.dir}" />
         <exec executable="bash" failonerror="true">
             <arg value="scripts/call_dex.sh" />
             <arg value="${dex.dir}" />
-            <arg value="${jar.dir}" />
+            <arg value="${dex.dir}/${jar.bin.shrunk.file}" />
             <arg value="${dep.dir}" />
         </exec>
+        <delete file="${dex.dir}/${jar.bin.shrunk.file}" />
     </target>
 
     <target name="check-if-natives-exsit">

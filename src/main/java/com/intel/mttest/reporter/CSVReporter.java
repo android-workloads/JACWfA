@@ -48,7 +48,7 @@ public class CSVReporter {
             e.printStackTrace();
         }
 	    // TODO the default version is hardcoded, approach is OK for java/host, not for device
-	    String version = System.getProperty("mttest_version", "1.1");
+	    String version = System.getProperty("mttest_version", "1.2");
 	    ret += "/" + version;
 	    return ret;
 	}
